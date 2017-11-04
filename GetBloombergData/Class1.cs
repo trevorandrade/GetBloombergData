@@ -25,6 +25,8 @@ public static class DnaTestFunctions
     }
 
 
+    // Bloomberg stores mcaps in a table and so we first have to search for text element 
+    // which has market cap and then the actual value is in table element right after that
     [ExcelFunction(Name = "getMarketCap", Description = "Goes to https://www.bloomberg.com/quote/ticker and grabs marketcap", Category = "My functions")]
     public static double getMarketCap(
     [ExcelArgument(Name = "ticker", Description = "Bloomberg ticker e.g. 7922:JP")] string ticker)
@@ -33,17 +35,19 @@ public static class DnaTestFunctions
         var web = new HtmlWeb();
         var doc = web.Load(url);
         string selector = "//*[contains(text(),'Market Cap')]";
-        var foundElement = doc.DocumentNode.SelectSingleNode(selector);
-        string unit = Regex.Match(foundElement.InnerText, @"\((\w)").Groups[1].Value;
+        var foundElement = doc.DocumentNode.SelectSingleNode(selector); // find element with market cap
+        // bloomberg site has Market Cap (b USD) and we try to extract b to know whether unit is bilions or millions
+        string unit = Regex.Match(foundElement.InnerText, @"\((\w)").Groups[1].Value; 
         double multiplier = 1;
         switch (unit)
         {
             case "b": multiplier = 1E9; break;
             case "m": multiplier = 1E6; break;
         }
+        // the actual value of market cap is the number immediately after the market cap string
         string marketCap = foundElement.NextSibling.NextSibling.InnerText;
         double marketCapValue = 1;
-        Double.TryParse(marketCap, out marketCapValue);
+        Double.TryParse(marketCap, out marketCapValue); // convert mcap string to double
         return marketCapValue * multiplier;
     }
 
