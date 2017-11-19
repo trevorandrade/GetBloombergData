@@ -67,13 +67,13 @@ public static class DnaTestFunctions
     public static string getName(
         [ExcelArgument(Name = "ticker", Description = "BLoomberg ticker e.g. 7922:JP")] string ticker)
     {
-        return getBloombergAttribute(ticker, "//h1[@class='name']");
+        return getBloombergAttribute(ticker, "//*[starts-with(@class,'companyName__')]");
     }
 
     [ExcelFunction(Name = "getPrice", Description = "Get price of stock from Bloomberg webpage using ticker", Category = "My functions")]
     public static string getPrice(
         [ExcelArgument(Name = "ticker", Description = "BLoomberg ticker e.g. 7922:JP")] string ticker)
     {
-        return getBloombergAttribute(ticker, "//div[@class='price']");
+        return getBloombergAttribute(ticker, "//span[starts-with(@class,'priceText__')]");
     }
 }
